@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Studio — Minimalist PDF Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Marked.js for Markdown Parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="app-navbar">
+    <div class="navbar-left" id="sidebar-logo">
+      <span class="logo-icon"><i data-lucide="file-text"></i></span>
+      <h1>PDF Studio</h1>
+    </div>
+    
+    <div class="navbar-center">
+      <a href="#" class="navbar-link active" id="nav-all-tools">All Tools</a>
+      <a href="#summarize" class="navbar-link" id="nav-ai-tools" data-tool="summarize">Gemini</a>
+      <a href="#merge" class="navbar-link" id="nav-pdf-tools" data-tool="merge">Organize</a>
+    </div>
+
+    <div class="navbar-right"></div>
+  </header>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <!-- Organize -->
+        <div class="nav-category">
+          <span class="category-title">Organize</span>
+          <a href="#merge" class="nav-link" data-tool="merge">
+            <i data-lucide="git-merge"></i><span>Merge PDF</span>
+          </a>
+          <a href="#split" class="nav-link" data-tool="split">
+            <i data-lucide="scissors"></i><span>Split PDF</span>
+          </a>
+          <a href="#remove-pages" class="nav-link" data-tool="remove-pages">
+            <i data-lucide="file-minus"></i><span>Remove Pages</span>
+          </a>
+          <a href="#extract" class="nav-link" data-tool="extract">
+            <i data-lucide="file-output"></i><span>Extract Pages</span>
+          </a>
+          <a href="#rotate" class="nav-link" data-tool="rotate">
+            <i data-lucide="rotate-cw"></i><span>Rotate PDF</span>
+          </a>
+        </div>
+
+        <!-- Optimize -->
+        <div class="nav-category">
+          <span class="category-title">Optimize</span>
+          <a href="#compress" class="nav-link" data-tool="compress">
+            <i data-lucide="minimize-2"></i><span>Compress PDF</span>
+          </a>
+          <a href="#ocr" class="nav-link" data-tool="ocr">
+            <i data-lucide="scan-text"></i><span>OCR PDF</span>
+          </a>
+          <a href="#compare" class="nav-link" data-tool="compare">
+            <i data-lucide="columns"></i><span>Compare PDF</span>
+          </a>
+        </div>
+
+        <!-- Convert To PDF -->
+        <div class="nav-category">
+          <span class="category-title">Convert to PDF</span>
+          <a href="#jpg-to-pdf" class="nav-link" data-tool="jpg-to-pdf">
+            <i data-lucide="image"></i><span>JPG to PDF</span>
+          </a>
+          <a href="#word-to-pdf" class="nav-link" data-tool="word-to-pdf">
+            <i data-lucide="file-type-2"></i><span>Word to PDF</span>
+          </a>
+          <a href="#ppt-to-pdf" class="nav-link" data-tool="ppt-to-pdf">
+            <i data-lucide="presentation"></i><span>PowerPoint to PDF</span>
+          </a>
+          <a href="#excel-to-pdf" class="nav-link" data-tool="excel-to-pdf">
+            <i data-lucide="table"></i><span>Excel to PDF</span>
+          </a>
+        </div>
+
+        <!-- Convert From PDF -->
+        <div class="nav-category">
+          <span class="category-title">Convert from PDF</span>
+          <a href="#pdf-to-jpg" class="nav-link" data-tool="pdf-to-jpg">
+            <i data-lucide="images"></i><span>PDF to JPG</span>
+          </a>
+          <a href="#pdf-to-word" class="nav-link" data-tool="pdf-to-word">
+            <i data-lucide="file-text"></i><span>PDF to Word</span>
+          </a>
+          <a href="#pdf-to-ppt" class="nav-link" data-tool="pdf-to-ppt">
+            <i data-lucide="presentation"></i><span>PDF to PPT</span>
+          </a>
+          <a href="#pdf-to-excel" class="nav-link" data-tool="pdf-to-excel">
+            <i data-lucide="table"></i><span>PDF to Excel</span>
+          </a>
+        </div>
+
+        <!-- Security & Edits -->
+        <div class="nav-category">
+          <span class="category-title">Security & Edits</span>
+          <a href="#protect" class="nav-link" data-tool="protect">
+            <i data-lucide="lock"></i><span>Protect PDF</span>
+          </a>
+          <a href="#unlock" class="nav-link" data-tool="unlock">
+            <i data-lucide="unlock"></i><span>Unlock PDF</span>
+          </a>
+          <a href="#watermark" class="nav-link" data-tool="watermark">
+            <i data-lucide="type"></i><span>Watermark</span>
+          </a>
+          <a href="#page-numbers" class="nav-link" data-tool="page-numbers">
+            <i data-lucide="hash"></i><span>Page Numbers</span>
+          </a>
+          <a href="#forms" class="nav-link" data-tool="forms">
+            <i data-lucide="edit-3"></i><span>PDF Forms</span>
+          </a>
+        </div>
+
+        <!-- AI Tools -->
+        <div class="nav-category">
+          <span class="category-title">Gemini</span>
+          <a href="#summarize" class="nav-link" data-tool="summarize">
+            <i data-lucide="sparkles"></i><span>AI Summarizer</span>
+          </a>
+          <a href="#chat" class="nav-link" data-tool="chat">
+            <i data-lucide="message-square"></i><span>Chat with PDF</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content Pane -->
+    <main class="main-content">
+      
+      <!-- Welcome Dashboard -->
+      <section id="home-view" class="view-container active">
+        <div class="hero">
+          <h2>Simplify your PDF workflow</h2>
+          <p>A clean collection of orange-accented, open source tools to optimize, convert, protect, and edit your PDF files instantly in your browser.</p>
+        </div>
+
+        <div class="quick-tools-grid">
+          <a href="#merge" class="quick-card nav-link" data-tool="merge">
+            <div class="card-icon"><i data-lucide="git-merge"></i></div>
+            <h3>Merge PDF</h3>
+            <p>Combine multiple PDFs into a single file in the exact order you want.</p>
+          </a>
+          <a href="#split" class="quick-card nav-link" data-tool="split">
+            <div class="card-icon"><i data-lucide="scissors"></i></div>
+            <h3>Split PDF</h3>
+            <p>Separate pages or extract specific page ranges into new documents.</p>
+          </a>
+          <a href="#compress" class="quick-card nav-link" data-tool="compress">
+            <div class="card-icon"><i data-lucide="minimize-2"></i></div>
+            <h3>Compress PDF</h3>
+            <p>Optimize and shrink your PDF files to reduce file size without losing quality.</p>
+          </a>
+          <a href="#protect" class="quick-card nav-link" data-tool="protect">
+            <div class="card-icon"><i data-lucide="lock"></i></div>
+            <h3>Protect PDF</h3>
+            <p>Secure your sensitive data by encrypting your PDF with a strong password.</p>
+          </a>
+          <a href="#ocr" class="quick-card nav-link" data-tool="ocr">
+            <div class="card-icon"><i data-lucide="scan-text"></i></div>
+            <h3>OCR PDF</h3>
+            <p>Extract searchable, selectable text from scanned PDF pages or images.</p>
+          </a>
+          <a href="#summarize" class="quick-card nav-link" data-tool="summarize">
+            <div class="card-icon"><i data-lucide="sparkles"></i></div>
+            <h3>AI Summarizer</h3>
+            <p>Generate precise, readable summary reports of long PDF documents instantly.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Tool Workspace -->
+      <section id="tool-view" class="view-container">
+        <div class="workspace-header">
+          <div class="workspace-title-area">
+            <h2 id="tool-title">Merge PDF</h2>
+            <p id="tool-desc">Combine PDFs in the order you want with the easiest PDF merger available.</p>
+          </div>
+          <button class="back-home-btn" id="back-home"><i data-lucide="arrow-left"></i>Back to Home</button>
+        </div>
+
+        <div class="workspace-box">
+          <div class="workspace-main">
+            <div class="drop-zone" id="drop-zone">
+              <div class="drop-icon"><i data-lucide="upload-cloud" size="48"></i></div>
+              <p>Upload your files</p>
+              <span id="drop-zone-help">Drag & drop files here, or click to browse</span>
+              <input type="file" id="file-input" multiple style="display: none;" />
+            </div>
+
+            <div id="file-list" class="file-list"></div>
+
+             <!-- Gemini Analysis Options -->
+             <div id="gemini-options-container" class="gemini-options-box" style="display: none;">
+               <div class="options-group">
+                 <span class="options-group-title">Immediate</span>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-bullet-summary" checked />
+                   <span class="checkmark"></span>
+                   <span class="label-text">Bullet summary</span>
+                 </label>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-key-points" checked />
+                   <span class="checkmark"></span>
+                   <span class="label-text">Key points extraction</span>
+                 </label>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-title-gen" checked />
+                   <span class="checkmark"></span>
+                   <span class="label-text">Title generation</span>
+                 </label>
+               </div>
+               <div class="options-group">
+                 <span class="options-group-title">Then</span>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-chat-pdf" checked disabled />
+                   <span class="checkmark"></span>
+                   <span class="label-text">Chat with PDF</span>
+                 </label>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-semantic-search" />
+                   <span class="checkmark"></span>
+                   <span class="label-text">Semantic search</span>
+                 </label>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-flashcards" />
+                   <span class="checkmark"></span>
+                   <span class="label-text">AI flashcards</span>
+                 </label>
+                 <label class="checkbox-container">
+                   <input type="checkbox" id="opt-quiz" />
+                   <span class="checkmark"></span>
+                   <span class="label-text">AI quiz generation</span>
+                 </label>
+               </div>
+             </div>
+
+            <div class="action-panel" id="action-panel">
+              <div id="input-options" class="options-box">
+                 <label id="input-label" for="custom-input">Input Options:</label>
+                 <input type="text" id="custom-input" placeholder="" />
+              </div>
+              <button id="action-btn" class="primary-btn">Execute</button>
+              <div class="spinner" id="loading-spinner" style="display: none;"></div>
+            </div>
+            
+            <div id="result-box" class="result-box" style="display: none;"></div>
+          </div>
+
+          <!-- Gemini Side Panel -->
+          <div class="workspace-side" id="gemini-side-panel" style="display: none;">
+            <div class="side-header">
+              <div class="side-title">
+                <i data-lucide="sparkles" style="color: var(--accent); width: 18px; height: 18px;"></i>
+                <span>Gemini Analysis</span>
+              </div>
+              <button id="copy-result-btn" class="btn-icon" title="Copy text">
+                <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+            <div class="side-content" id="gemini-result-content">
+              <div class="empty-state" style="text-align: center; padding: 3rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                <i data-lucide="message-square" style="color: var(--text-muted); width: 32px; height: 32px;"></i>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">Waiting for document analysis...</p>
+              </div>
+            </div>
+             <!-- Side Chat Input Footer -->
+             <div class="side-chat-input-area" id="side-chat-input-area" style="display: none;">
+               <input type="text" id="side-chat-input" placeholder="Ask a follow-up question..." />
+               <button id="side-chat-send" class="btn-icon" title="Send question">
+                 <i data-lucide="send" style="width: 16px; height: 16px; color: var(--accent);"></i>
+               </button>
+             </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PDF.js & JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
