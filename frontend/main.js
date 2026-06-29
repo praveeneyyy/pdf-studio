@@ -239,6 +239,56 @@ function renderFileList() {
 }
 
 
+function parseRanges(rangesStr, maxPages) {
+    if(!rangesStr) return [];
+    const pages = new Set();
+    rangesStr.split(',').forEach(part => {
+        part = part.trim();
+        if(part.includes('-')) {
+            const [start, end] = part.split('-').map(n => parseInt(n));
+            if(start && end) {
+                for(let i=start; i<=end; i++) pages.add(i-1);
+            }
+        } else {
+            const val = parseInt(part);
+            if(val) pages.add(val-1);
+        }
+    });
+    return Array.from(pages);
+}
+
+function triggerDownload(blob, downloadName) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = downloadName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    
+    actionPanel.style.display = 'none';
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      <div class="success-result-box" style="text-align: center; padding: 30px 20px; background: rgba(16, 185, 129, 0.08); border: 2px solid #10b981; border-radius: 16px; margin-top: 20px; box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);">
+        <div style="color: #10b981; font-size: 54px; margin-bottom: 12px;">🎉</div>
+        <h3 style="color: #10b981; font-size: 24px; font-weight: 700; margin-bottom: 8px;">Processing Successful!</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 16px;">Your document has been successfully converted locally with zero wait time.</p>
+        <a href="${url}" download="${downloadName}" class="primary-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 28px; text-decoration: none; font-size: 16px; font-weight: 600; background: #10b981; color: white; border-radius: 10px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); transition: all 0.2s ease;">
+          <i data-lucide="download"></i> Download ${downloadName}
+        </a>
+        <div style="margin-top: 20px;">
+          <button id="process-another-btn" class="btn-secondary" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; cursor: pointer;">Process Another File</button>
+        </div>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    document.getElementById('process-another-btn').addEventListener('click', () => {
+        uploadedFiles = [];
+        renderFileList();
+        resultBox.style.display = 'none';
+    });
+}
+
 // Action execution
 actionBtn.addEventListener('click', async () => {
   if (uploadedFiles.length === 0) return;
@@ -246,6 +296,98 @@ actionBtn.addEventListener('click', async () => {
   actionBtn.style.display = 'none';
   loadingSpinner.style.display = 'block';
   resultBox.style.display = 'none';
+
+  const clientSidePdfTools = ['merge', 'split', 'rotate', 'remove-pages', 'extract'];
+  if (clientSidePdfTools.includes(currentTool)) {
+      try {
+          const PDFDocument = window.PDFLib.PDFDocument;
+          const progressContainer = document.getElementById('progress-container');
+          const progressBarFill = document.getElementById('progress-bar-fill');
+          const progressText = document.getElementById('progress-text');
+          
+          if (progressContainer) {
+              progressContainer.style.display = 'block';
+              progressBarFill.style.width = '50%';
+              progressText.textContent = 'Processing locally...';
+          }
+
+          let finalBytes;
+          let downloadName = 'result.pdf';
+          
+          if (currentTool === 'merge') {
+              const mergedPdf = await PDFDocument.create();
+              for (const file of uploadedFiles) {
+                  const bytes = await file.arrayBuffer();
+                  const pdf = await PDFDocument.load(bytes);
+                  const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                  copiedPages.forEach((page) => mergedPdf.addPage(page));
+              }
+              finalBytes = await mergedPdf.save();
+              downloadName = 'merged.pdf';
+          } else if (currentTool === 'split') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const zip = new JSZip();
+              
+              for (let i = 0; i < pdf.getPageCount(); i++) {
+                  const newPdf = await PDFDocument.create();
+                  const [copiedPage] = await newPdf.copyPages(pdf, [i]);
+                  newPdf.addPage(copiedPage);
+                  const pageBytes = await newPdf.save();
+                  zip.file(`page-${i+1}.pdf`, pageBytes);
+              }
+              finalBytes = await zip.generateAsync({ type: 'uint8array' });
+              downloadName = 'split_pages.zip';
+          } else if (currentTool === 'rotate') {
+              const degrees = parseInt(customInput.value) || 90;
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const pages = pdf.getPages();
+              pages.forEach(page => page.setRotation(window.PDFLib.degrees(degrees)));
+              finalBytes = await pdf.save();
+              downloadName = 'rotated.pdf';
+          } else if (currentTool === 'remove-pages') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const pagesToRemove = parseRanges(customInput.value, pdf.getPageCount());
+              pagesToRemove.sort((a,b) => b - a).forEach(index => {
+                 if(index >= 0 && index < pdf.getPageCount()) pdf.removePage(index);
+              });
+              finalBytes = await pdf.save();
+              downloadName = 'pages_removed.pdf';
+          } else if (currentTool === 'extract') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const pagesToKeep = parseRanges(customInput.value, pdf.getPageCount());
+              
+              const newPdf = await PDFDocument.create();
+              const validIndices = pagesToKeep.filter(i => i >= 0 && i < pdf.getPageCount());
+              if(validIndices.length > 0) {
+                 const copiedPages = await newPdf.copyPages(pdf, validIndices);
+                 copiedPages.forEach(p => newPdf.addPage(p));
+              }
+              finalBytes = await newPdf.save();
+              downloadName = 'extracted_pages.pdf';
+          }
+          
+          const blob = new Blob([finalBytes], { type: downloadName.endsWith('.zip') ? 'application/zip' : 'application/pdf' });
+          triggerDownload(blob, downloadName);
+          
+      } catch(e) {
+          console.error(e);
+          alert('Local processing failed: ' + e.message);
+      } finally {
+          actionBtn.style.display = 'block';
+          loadingSpinner.style.display = 'none';
+          const progressContainer = document.getElementById('progress-container');
+          if (progressContainer) progressContainer.style.display = 'none';
+      }
+      return;
+  }
 
   // Client-side execution for PDF to JPG to avoid missing native binaries on server
   if (currentTool === 'pdf-to-jpg') {
@@ -390,21 +532,23 @@ actionBtn.addEventListener('click', async () => {
             blob: async () => xhr.response
           });
         } else {
-          // Attempt to parse error
-          let errorMessage = xhr.statusText || 'Request failed';
-          if (xhr.responseType === 'blob') {
-             // Handle blob errors
-             const reader = new FileReader();
-             reader.onload = function() {
-                 try {
-                     const errObj = JSON.parse(reader.result);
-                     if (errObj.error) errorMessage = errObj.error;
-                 } catch (e) {
-                     errorMessage = reader.result;
-                 }
+          let errorMessage = xhr.statusText || 'Request failed with status ' + xhr.status;
+          if (xhr.responseType === 'blob' && xhr.response) {
+             try {
+                 const reader = new FileReader();
+                 reader.onload = function() {
+                     try {
+                         const errObj = JSON.parse(reader.result);
+                         if (errObj.error) errorMessage = errObj.error;
+                     } catch (e) {
+                         errorMessage = reader.result || errorMessage;
+                     }
+                     reject(new Error(errorMessage));
+                 };
+                 reader.readAsText(xhr.response);
+             } catch (err) {
                  reject(new Error(errorMessage));
-             };
-             reader.readAsText(xhr.response);
+             }
           } else {
              if (xhr.response && xhr.response.error) errorMessage = xhr.response.error;
              reject(new Error(errorMessage));
@@ -412,7 +556,7 @@ actionBtn.addEventListener('click', async () => {
         }
       };
 
-      xhr.onerror = () => reject(new Error('Network request failed'));
+      xhr.onerror = () => reject(new Error('Network request failed or CORS issue'));
       xhr.send(formData);
     });
 
