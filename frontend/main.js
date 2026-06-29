@@ -346,20 +346,75 @@ actionBtn.addEventListener('click', async () => {
   }
 
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = errorText;
-        try {
-            const errObj = JSON.parse(errorText);
-            if (errObj.error) errorMessage = errObj.error;
-        } catch (e) {}
-        throw new Error(errorMessage);
+    const progressContainer = document.getElementById('progress-container');
+    const progressBarFill = document.getElementById('progress-bar-fill');
+    const progressText = document.getElementById('progress-text');
+    
+    if (progressContainer) {
+      progressContainer.style.display = 'block';
+      progressBarFill.style.width = '0%';
+      progressText.textContent = 'Preparing... 0%';
     }
+
+    const response = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_BASE}${endpoint}`, true);
+      
+      const expectsJson = currentTool === 'ocr' || (currentTool === 'forms' && !formData.has('action'));
+      xhr.responseType = expectsJson ? 'json' : 'blob';
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && progressContainer) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          progressBarFill.style.width = percentComplete + '%';
+          progressText.textContent = `Uploading... ${percentComplete}%`;
+        }
+      };
+
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable && progressContainer) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          progressBarFill.style.width = percentComplete + '%';
+          progressText.textContent = `Processing & Downloading... ${percentComplete}%`;
+        } else if (progressContainer) {
+          progressText.textContent = 'Processing...';
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve({
+            ok: true,
+            status: xhr.status,
+            json: async () => xhr.response,
+            blob: async () => xhr.response
+          });
+        } else {
+          // Attempt to parse error
+          let errorMessage = xhr.statusText || 'Request failed';
+          if (xhr.responseType === 'blob') {
+             // Handle blob errors
+             const reader = new FileReader();
+             reader.onload = function() {
+                 try {
+                     const errObj = JSON.parse(reader.result);
+                     if (errObj.error) errorMessage = errObj.error;
+                 } catch (e) {
+                     errorMessage = reader.result;
+                 }
+                 reject(new Error(errorMessage));
+             };
+             reader.readAsText(xhr.response);
+          } else {
+             if (xhr.response && xhr.response.error) errorMessage = xhr.response.error;
+             reject(new Error(errorMessage));
+          }
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network request failed'));
+      xhr.send(formData);
+    });
 
     const expectsJson = currentTool === 'ocr' || (currentTool === 'forms' && !formData.has('action'));
 
@@ -424,6 +479,8 @@ actionBtn.addEventListener('click', async () => {
     actionBtn.style.display = 'block';
   } finally {
     loadingSpinner.style.display = 'none';
+    const progressContainer = document.getElementById('progress-container');
+    if (progressContainer) progressContainer.style.display = 'none';
   }
 });
 
