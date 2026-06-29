@@ -1,118 +1,133 @@
-<div align="center">
-  <img src="frontend/public/logo.svg" alt="uniPDF Logo" width="120" />
+# PDFly - Universal High-Fidelity Document Conversion Engine & PDF Tools Platform
 
-  # 📄 uniPDF
-
-  **A sleek, modern, self-hosted suite of minimalist PDF tools.**
-
-  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-  [![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
-  [![Vite](https://img.shields.io/badge/Vite-Frontend-purple.svg)](https://vitejs.dev/)
-  
-  [Features](#-key-features) • [Architecture](#-architecture) • [Installation](#-quick-start) • [Tech Stack](#-technology-stack)
-</div>
+Welcome to **PDFly**, a professional, enterprise-grade PDF tools platform engineered to deliver **100% visual fidelity** for document conversion, OCR, and advanced PDF manipulations. 
 
 ---
 
-## 🌟 Key Features
+## 🌟 Architectural Philosophy: 100% Visual Fidelity
 
-uniPDF combines essential offline PDF processing into a unified, privacy-first workspace. 
-
-### 🛠️ PDF Manipulation
-* **Merge & Split**: Combine multiple PDFs in custom orders, or split pages into separate files.
-* **Page Manager**: Extract specific ranges or delete pages from any PDF.
-* **Rotate Pages**: Multi-page rotation (90°, 180°, 270°).
-* **Page Numbers & Watermarks**: Inject page numbers or stamp custom watermark text across files.
-* **Forms Processor**: Extract form fields, or fill out fillable forms dynamically.
-
-### 🔒 Document Security
-* **Protect PDF**: Encrypt documents with strong passwords.
-* **Unlock PDF**: Clear security settings and permissions.
-
-### 🔄 File Converters
-* **Convert to PDF**: Convert JPG, PNG, Word (`.docx`), PowerPoint (`.pptx`), and Excel (`.xlsx`) files.
-* **Convert from PDF**: Convert PDFs back into JPG image packages, Word files, PowerPoint presentations, or Excel sheets.
-* **OCR Text Extractor**: Convert images or non-selectable scanned PDFs into searchable, selectable digital text.
+PDFly strictly implements a **native rendering engine philosophy**. Rather than relying on inaccurate Javascript document rebuilders (such as Mammoth, SheetJS html export, or canvas re-draws), PDFly communicates directly with native rendering binaries (such as LibreOffice and Gotenberg). This guarantees that every exported file looks **identical** to the original—preserving exact layouts, fonts, margins, tables, merged cells, shapes, charts, watermarks, and pagination.
 
 ---
 
-## 📐 Architecture
+## 🚀 Production Architecture
 
-uniPDF is designed as a modular, container-ready **microservices architecture** managed via a unified API Gateway. This ensures high availability and clean separation of concerns.
+The backend has been consolidated from a multi-process microservice structure into a **Unified Express Monolith** following a clean, layered architectural pattern:
 
 ```text
-                      +-------------------+
-                      |   Vite Frontend   | (Port 5173)
-                      +---------+---------+
-                                |
-                                v
-                      +---------+---------+
-                      |    API Gateway    | (Port 3000)
-                      +----+----+----+----+
-                           |    |    |    \
-      +--------------------+    |    |     +--------------------+
-      |                         |    |                          |
-      v                         v    v                          v
-+-----+-------+     +-----+-------+  +-----+-------+     +-----+-------+
-| PDF Service |     | Conv-Service|  | OCR Service |     |Office Service|
-| (Port 3001) |     | (Port 3002) |  | (Port 3003) |     | (Port 3005) |
-+-------------+     +-------------+  +-------------+     +-------------+
+pdf_tools/
+│
+├── backend/
+│      ├── routes/          # Express route definitions (/api/pdf, /api/conversion, /api/ocr, /api/office)
+│      ├── controllers/     # Request validation, response handling, and automated file cleanup
+│      ├── services/        # Business logic for PDF manipulation, OCR, and Office conversions
+│      ├── middleware/      # Rate limiting, large file streaming upload limits, error handling
+│      ├── utils/           # Automated visual verification QA gate & robust file sweeps
+│      ├── config/          # Centralized environment configuration
+│      └── server.js        # Main Express server entry point with production hardening
+│
+├── frontend/               # Premium Vite SPA frontend
+│
+├── package.json            # Root package.json for unified backend installation and startup
+├── render.yaml             # Render Infrastructure-as-Code configuration
+├── netlify.toml            # Netlify deployment configuration with SPA routing rules
+└── .env.example            # Template environment configuration
 ```
 
 ---
 
-## 🚀 Quick Start
+## 📦 Getting Started & Local Development
 
-### 📋 Prerequisites
-* **Node.js** (v18 or higher recommended)
-* **npm** or **yarn**
-* **LibreOffice**: *Required for pixel-perfect Office document conversions (Word/Excel/PPT to PDF).*
+### 1. Prerequisites
+- **Node.js**: v18, v20, v22, or higher.
+- **LibreOffice** (Optional but recommended for local Word/Excel/PPT conversions): Installed at standard system paths (e.g., `C:\Program Files\LibreOffice\program\soffice.exe` or `/usr/bin/soffice`).
 
-### 🔧 Setup Instructions
+### 2. Installation
+Simply install all backend dependencies from the root directory:
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/unipdf.git
-   cd unipdf
-   ```
+```bash
+npm install
+```
 
-2. **Install Dependencies**:
-   Install dependencies across all microservices using the provided setup script:
-   ```powershell
-   # Windows (PowerShell)
-   ./setup.ps1
-   ```
+To install and build the frontend:
+```bash
+npm run build:frontend
+```
 
-3. **Run the Application**:
-   Start the multi-service orchestra script, which automatically boots the gateway, all 4 microservices, and compiles/serves the frontend via Vite:
-   ```bash
-   node start.js
-   ```
+### 3. Running Locally
+Start the unified Express server:
 
-4. **Access the Dashboard**:
-   Open [http://localhost:5173/](http://localhost:5173/) in your web browser and start managing your PDFs!
+```bash
+npm start
+```
+The server will run on `http://localhost:3000` (or your configured `PORT`).
 
 ---
 
-## 🛠️ Technology Stack
+## 🌍 Production Deployment Guide
 
-**Frontend**
-* HTML5, Vanilla JavaScript, CSS3 Design Tokens
-* [Lucide Icons](https://lucide.dev/)
-* [marked.js](https://marked.js.org/) (Markdown parser)
-* [PDF.js](https://mozilla.github.io/pdf.js/) (Client-side rendering)
-* [JSZip](https://stuk.github.io/jszip/) (Batch zip generation)
+### Backend: Deploying to Render
+PDFly comes fully configured for immediate deployment to **Render** as a single, production-ready Web Service.
 
-**Backend Services**
-* Node.js, Express, Multer
-* `http-proxy-middleware` for Gateway routing
-* `pdf-parse`, `diff` (Comparators)
-* `libreoffice-convert` (High-Fidelity rendering)
+1. Connect your GitHub repository to Render.
+2. Render will automatically detect the `render.yaml` blueprint in the root directory.
+3. It will configure:
+   - **Runtime**: Node 22
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Health Check Path**: `/api/health`
+   - **Persistent Disk**: A 10GB persistent volume mounted at `/opt/render/project/src/uploads` to handle large file streaming up to 500MB without ephemeral storage loss.
+
+### Frontend: Deploying to Netlify
+The Vite frontend is configured for seamless deployment to **Netlify** via `netlify.toml`.
+
+1. Connect your repository to Netlify.
+2. Netlify will automatically apply the following settings:
+   - **Base Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Publish Directory**: `dist`
+3. Add the following Environment Variable in your Netlify dashboard:
+   - `VITE_API_URL`: Set this to your deployed Render backend URL (e.g., `https://pdf-tools-backend.onrender.com`).
+4. Netlify will automatically handle SPA redirect routing (`/* -> /index.html`).
 
 ---
 
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/unipdf/issues).
+## 🔐 Environment Variables
 
-## 📄 License
-This project is open-source and licensed under the [MIT License](LICENSE).
+Create a `.env` file in the root directory (copy from `.env.example`):
+
+```env
+PORT=3000
+NODE_ENV=production
+FRONTEND_URL=https://pdfly-tools.netlify.app
+API_URL=http://localhost:3000
+UPLOAD_DIR=uploads
+TEMP_DIR=temp
+```
+
+For the frontend, create `frontend/.env` (copy from `frontend/.env.example`):
+```env
+VITE_API_URL=https://pdf-tools-backend.onrender.com
+```
+
+---
+
+## 🛡️ Production Security & Performance Optimization
+
+- **Helmet & Security Headers**: Secures HTTP response headers while explicitly permitting cross-origin file downloads (`crossOriginResourcePolicy: "cross-origin"`).
+- **Compression**: gzip compression enabled for faster payload delivery.
+- **Morgan Request Logging**: Configured in `combined` mode for complete request traceability.
+- **Global Rate Limiting**: `express-rate-limit` shields endpoints against DDoS attacks and abuse (1000 requests per 15 minutes per IP).
+- **Large File Streaming**: Multer configured with up to 500MB file size limits and automated post-request temporary file sweeps.
+- **Graceful Shutdown**: Traps `SIGINT` and `SIGTERM` signals to close active HTTP connections and clean up resources gracefully.
+
+---
+
+## ❓ Troubleshooting
+
+### 1. "Native rendering engine is required for pixel-perfect layout preservation"
+This error occurs if you attempt to convert an Office document (`.docx`, `.xlsx`, `.pptx`) but LibreOffice is not installed on the host machine. 
+- **Solution**: Install LibreOffice locally, or utilize Gotenberg / a Dockerized LibreOffice runtime in your cloud environment.
+
+### 2. Frontend CORS Errors
+- **Solution**: Ensure `VITE_API_URL` is correctly configured in your frontend environment variables without a trailing slash (e.g., `https://my-backend.onrender.com`). The backend CORS configuration is built to accept requests seamlessly across Netlify and custom domains.

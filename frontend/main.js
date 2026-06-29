@@ -1,6 +1,6 @@
 let currentTool = null;
 let uploadedFiles = [];
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000/api'; // Pointing to API Gateway
+const API_BASE = import.meta.env.VITE_API_BASE || ((import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api'); // Pointing to unified Express API
 
 // Markdown Rendering Helper with offline fallback
 const renderMarkdown = (text) => {
