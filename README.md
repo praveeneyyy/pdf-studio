@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="frontend/public/logo.svg" alt="PDFly Logo" width="120" />
+  <img src="frontend/public/logo.svg" alt="uniPDF Logo" width="120" />
 
-  # 📄 PDFly
+  # 📄 uniPDF
 
   **A sleek, modern, self-hosted suite of minimalist PDF tools.**
 
@@ -16,7 +16,7 @@
 
 ## 🌟 Key Features
 
-PDFly combines essential offline PDF processing into a unified, privacy-first workspace. 
+uniPDF combines essential offline PDF processing into a unified, privacy-first workspace. 
 
 ### 🛠️ PDF Manipulation
 * **Merge & Split**: Combine multiple PDFs in custom orders, or split pages into separate files.
@@ -38,7 +38,7 @@ PDFly combines essential offline PDF processing into a unified, privacy-first wo
 
 ## 📐 Architecture
 
-PDFly is designed as a modular, container-ready **microservices architecture** managed via a unified API Gateway. This ensures high availability and clean separation of concerns.
+uniPDF is designed as a modular, container-ready **microservices architecture** managed via a unified API Gateway. This ensures high availability and clean separation of concerns.
 
 ```text
                       +-------------------+
@@ -72,8 +72,8 @@ PDFly is designed as a modular, container-ready **microservices architecture** m
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/pdfly.git
-   cd pdfly
+   git clone https://github.com/your-username/unipdf.git
+   cd unipdf
    ```
 
 2. **Install Dependencies**:
@@ -112,7 +112,7 @@ PDFly is designed as a modular, container-ready **microservices architecture** m
 ---
 
 ## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/pdfly/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/unipdf/issues).
 
 ## 📄 License
 This project is open-source and licensed under the [MIT License](LICENSE).
