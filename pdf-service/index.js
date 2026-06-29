@@ -31,16 +31,17 @@ const cleanup = (files) => {
 app.post('/api/merge', upload.array('pdfs', 20), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) return res.status(400).send('No files');
-        const mergedPdf = await PDFDocument.create();
-        for (const file of req.files) {
-            const pdfBytes = fs.readFileSync(file.path);
-            const pdf = await PDFDocument.load(pdfBytes);
-            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-            copiedPages.forEach((page) => mergedPdf.addPage(page));
+        const qpdf = await createQpdf();
+        const inputFiles = [];
+        for (let i = 0; i < req.files.length; i++) {
+            const filename = `/input${i}.pdf`;
+            qpdf.FS.writeFile(filename, fs.readFileSync(req.files[i].path));
+            inputFiles.push(filename);
         }
-        const bytes = await mergedPdf.save();
+        qpdf.callMain(['--empty', '--pages', ...inputFiles, '--', '/output.pdf']);
+        const mergedBytes = qpdf.FS.readFile('/output.pdf');
         const out = path.join(uploadDir, `merged-${Date.now()}.pdf`);
-        fs.writeFileSync(out, bytes);
+        fs.writeFileSync(out, mergedBytes);
         cleanup(req.files);
         res.download(out, 'merged.pdf', () => cleanup([{path: out}]));
     } catch (e) {
@@ -55,20 +56,15 @@ app.post('/api/merge', upload.array('pdfs', 20), async (req, res) => {
 app.post('/api/split', upload.single('pdf'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file');
-        const ranges = req.body.ranges; 
-        const pdf = await PDFDocument.load(fs.readFileSync(req.file.path));
-        const splitPdf = await PDFDocument.create();
+        const ranges = req.body.ranges ? req.body.ranges.replace(/\s+/g, '') : '1'; 
+        const qpdf = await createQpdf();
+        const pdfBytes = fs.readFileSync(req.file.path);
+        qpdf.FS.writeFile('/input.pdf', pdfBytes);
+        qpdf.callMain(['--empty', '--pages', '/input.pdf', ranges, '--', '/output.pdf']);
+        const splitBytes = qpdf.FS.readFile('/output.pdf');
         
-        let indices = ranges ? parseRanges(ranges, pdf.getPageCount()) : [0];
-        const validIndices = indices.filter(i => i >= 0 && i < pdf.getPageCount());
-        
-        if (validIndices.length === 0) return res.status(400).send('Invalid ranges');
-        const copiedPages = await splitPdf.copyPages(pdf, validIndices);
-        copiedPages.forEach((page) => splitPdf.addPage(page));
-        
-        const bytes = await splitPdf.save();
         const out = path.join(uploadDir, `split-${Date.now()}.pdf`);
-        fs.writeFileSync(out, bytes);
+        fs.writeFileSync(out, splitBytes);
         cleanup([req.file]);
         res.download(out, 'split.pdf', () => cleanup([{path: out}]));
     } catch (e) {
@@ -86,18 +82,23 @@ app.post('/api/remove-pages', upload.single('pdf'), async (req, res) => {
         const ranges = req.body.ranges; // e.g. "1, 3-5"
         if(!ranges) return res.status(400).send('No ranges provided');
         
-        const pdf = await PDFDocument.load(fs.readFileSync(req.file.path));
-        let toRemove = parseRanges(ranges, pdf.getPageCount());
-        // Remove in reverse order so indices don't shift
-        toRemove.sort((a,b) => b-a).forEach(index => {
-            if(index >= 0 && index < pdf.getPageCount()) {
-                pdf.removePage(index);
-            }
-        });
+        const pdf = await PDFDocument.load(fs.readFileSync(req.file.path), { ignoreEncryption: true });
+        const totalPages = pdf.getPageCount();
+        let toRemove = parseRanges(ranges, totalPages);
         
-        const bytes = await pdf.save();
+        const keepIndices = [];
+        for (let i = 0; i < totalPages; i++) {
+            if (!toRemove.includes(i)) keepIndices.push(i + 1);
+        }
+        const keepRange = keepIndices.join(',') || '1';
+        
+        const qpdf = await createQpdf();
+        qpdf.FS.writeFile('/input.pdf', fs.readFileSync(req.file.path));
+        qpdf.callMain(['--empty', '--pages', '/input.pdf', keepRange, '--', '/output.pdf']);
+        const outBytes = qpdf.FS.readFile('/output.pdf');
+        
         const out = path.join(uploadDir, `removed-${Date.now()}.pdf`);
-        fs.writeFileSync(out, bytes);
+        fs.writeFileSync(out, outBytes);
         cleanup([req.file]);
         res.download(out, 'removed.pdf', () => cleanup([{path: out}]));
     } catch (e) {
@@ -115,16 +116,13 @@ app.post('/api/rotate', upload.single('pdf'), async (req, res) => {
         const degreeStr = req.body.degrees || '90';
         const rotation = parseInt(degreeStr);
         
-        const pdf = await PDFDocument.load(fs.readFileSync(req.file.path));
-        const pages = pdf.getPages();
-        pages.forEach(page => {
-            const currentRotation = page.getRotation().angle;
-            page.setRotation(degrees(currentRotation + rotation));
-        });
+        const qpdf = await createQpdf();
+        qpdf.FS.writeFile('/input.pdf', fs.readFileSync(req.file.path));
+        qpdf.callMain(['--rotate=+' + rotation, '/input.pdf', '/output.pdf']);
+        const rotatedBytes = qpdf.FS.readFile('/output.pdf');
         
-        const bytes = await pdf.save();
         const out = path.join(uploadDir, `rotated-${Date.now()}.pdf`);
-        fs.writeFileSync(out, bytes);
+        fs.writeFileSync(out, rotatedBytes);
         cleanup([req.file]);
         res.download(out, 'rotated.pdf', () => cleanup([{path: out}]));
     } catch (e) {
@@ -153,10 +151,8 @@ app.post('/api/pdf-forms', upload.single('pdf'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file');
         
-        // MVP logic: If there's a JSON payload for fields, we fill it. 
-        // Otherwise, we just extract form fields and return their names.
         const pdfBytes = fs.readFileSync(req.file.path);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
         const form = pdfDoc.getForm();
         
         if (req.body.action === 'fill' && req.body.data) {
@@ -165,18 +161,15 @@ app.post('/api/pdf-forms', upload.single('pdf'), async (req, res) => {
                 try {
                     const field = form.getTextField(key);
                     if(field) field.setText(value);
-                } catch(err) {
-                    // Ignore missing/wrong type fields for simplicity
-                }
+                } catch(err) {}
             }
             form.flatten();
-            const bytes = await pdfDoc.save();
+            const bytes = await pdfDoc.save({ useObjectStreams: true });
             const out = path.join(uploadDir, `filled-${Date.now()}.pdf`);
             fs.writeFileSync(out, bytes);
             cleanup([req.file]);
             res.download(out, 'filled.pdf', () => cleanup([{path: out}]));
         } else {
-            // Just return field names
             const fields = form.getFields();
             const fieldNames = fields.map(f => f.getName());
             cleanup([req.file]);
@@ -200,7 +193,7 @@ app.post('/api/watermark', upload.single('pdf'), async (req, res) => {
         const text = req.body.text || 'CONFIDENTIAL';
         
         const pdfBytes = fs.readFileSync(req.file.path);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
         const pages = pdfDoc.getPages();
         
         pages.forEach((page) => {
@@ -215,7 +208,7 @@ app.post('/api/watermark', upload.single('pdf'), async (req, res) => {
             });
         });
         
-        const bytes = await pdfDoc.save();
+        const bytes = await pdfDoc.save({ useObjectStreams: true });
         const out = path.join(uploadDir, `watermark-${Date.now()}.pdf`);
         fs.writeFileSync(out, bytes);
         cleanup([req.file]);
@@ -234,7 +227,7 @@ app.post('/api/page-numbers', upload.single('pdf'), async (req, res) => {
         if (!req.file) return res.status(400).send('No file');
         
         const pdfBytes = fs.readFileSync(req.file.path);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
         const pages = pdfDoc.getPages();
         
         pages.forEach((page, idx) => {
@@ -247,7 +240,7 @@ app.post('/api/page-numbers', upload.single('pdf'), async (req, res) => {
             });
         });
         
-        const bytes = await pdfDoc.save();
+        const bytes = await pdfDoc.save({ useObjectStreams: true });
         const out = path.join(uploadDir, `numbered-${Date.now()}.pdf`);
         fs.writeFileSync(out, bytes);
         cleanup([req.file]);
@@ -317,22 +310,17 @@ app.post('/api/unlock', upload.single('pdf'), async (req, res) => {
 app.post('/api/extract', upload.single('pdf'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file');
-        const ranges = req.body.ranges; 
-        if(!ranges) return res.status(400).send('No ranges provided');
+        const ranges = req.body.ranges ? req.body.ranges.replace(/\s+/g, '') : '1'; 
+        if(!req.body.ranges) return res.status(400).send('No ranges provided');
         
-        const pdf = await PDFDocument.load(fs.readFileSync(req.file.path));
-        const splitPdf = await PDFDocument.create();
+        const qpdf = await createQpdf();
+        const pdfBytes = fs.readFileSync(req.file.path);
+        qpdf.FS.writeFile('/input.pdf', pdfBytes);
+        qpdf.callMain(['--empty', '--pages', '/input.pdf', ranges, '--', '/output.pdf']);
+        const extractedBytes = qpdf.FS.readFile('/output.pdf');
         
-        let indices = parseRanges(ranges, pdf.getPageCount());
-        const validIndices = indices.filter(i => i >= 0 && i < pdf.getPageCount());
-        
-        if (validIndices.length === 0) return res.status(400).send('Invalid ranges');
-        const copiedPages = await splitPdf.copyPages(pdf, validIndices);
-        copiedPages.forEach((page) => splitPdf.addPage(page));
-        
-        const bytes = await splitPdf.save();
         const out = path.join(uploadDir, `extracted-${Date.now()}.pdf`);
-        fs.writeFileSync(out, bytes);
+        fs.writeFileSync(out, extractedBytes);
         cleanup([req.file]);
         res.download(out, 'extracted.pdf', () => cleanup([{path: out}]));
     } catch (e) {

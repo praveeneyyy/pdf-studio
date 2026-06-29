@@ -9,19 +9,23 @@ app.use(cors());
 
 // Proxy configuration
 const services = {
-    '/api/pdf': 'http://localhost:3001',
-    '/api/conversion': 'http://localhost:3002',
-    '/api/ocr': 'http://localhost:3003',
-    '/api/ai': 'http://localhost:3004',
-    '/api/office': 'http://localhost:3005'
+    '/api/pdf': 'http://127.0.0.1:3001',
+    '/api/conversion': 'http://127.0.0.1:3002',
+    '/api/ocr': 'http://127.0.0.1:3003',
+    '/api/office': 'http://127.0.0.1:3005'
 };
 
-for (const [path, target] of Object.entries(services)) {
-    app.use(path, createProxyMiddleware({
+for (const [servicePath, target] of Object.entries(services)) {
+    app.use(servicePath, createProxyMiddleware({
         target,
         changeOrigin: true,
-        pathRewrite: {
-            '^/': '/api/' 
+        pathRewrite: (path, req) => {
+            if (path.startsWith(servicePath)) {
+                return path.replace(servicePath, '/api');
+            } else if (!path.startsWith('/api')) {
+                return '/api' + path;
+            }
+            return path;
         }
     }));
 }

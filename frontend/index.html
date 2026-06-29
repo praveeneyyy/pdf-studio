@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/2.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF Studio — Minimalist PDF Tools</title>
+  <title>PDFly — Minimalist PDF Tools</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,20 +16,25 @@
 </head>
 <body>
 
-  <!-- Top Navbar -->
-  <header class="app-navbar">
+  <!-- Floating Island Navbar -->
+  <header class="floating-navbar">
     <div class="navbar-left" id="sidebar-logo">
-      <span class="logo-icon"><i data-lucide="file-text"></i></span>
-      <h1>PDF Studio</h1>
+      <span class="logo-icon" style="display: flex; align-items: center; justify-content: center; overflow: hidden; width: 32px; height: 32px; border-radius: 4px;"><img src="/1.svg" alt="PDFly Logo" style="height: 100%; width: 100%; object-fit: cover; mix-blend-mode: multiply; transform: scale(1.4);" /></span>
+      <h1>PDFly</h1>
     </div>
     
-    <div class="navbar-center">
-      <a href="#" class="navbar-link active" id="nav-all-tools">All Tools</a>
-      <a href="#summarize" class="navbar-link" id="nav-ai-tools" data-tool="summarize">Gemini</a>
-      <a href="#merge" class="navbar-link" id="nav-pdf-tools" data-tool="merge">Organize</a>
+    <div class="navbar-center category-nav-links">
+      <button class="navbar-link nav-cat-btn active" id="nav-all-tools" data-cat="all">All Tools</button>
+      <button class="navbar-link nav-cat-btn" data-cat="organize">Organize</button>
+      <button class="navbar-link nav-cat-btn" data-cat="optimize">Optimize</button>
+      <button class="navbar-link nav-cat-btn" data-cat="convert">Convert</button>
+      <button class="navbar-link nav-cat-btn" data-cat="security">Security & Edits</button>
     </div>
 
-    <div class="navbar-right"></div>
+    <div class="navbar-right">
+      <span class="nav-status-badge"><i data-lucide="shield-check"></i> 100% Private & Secure</span>
+      <a href="https://github.com" target="_blank" class="btn-secondary"><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> GitHub</a>
+    </div>
   </header>
 
   <!-- App Wrapper -->
@@ -66,9 +71,6 @@
           </a>
           <a href="#ocr" class="nav-link" data-tool="ocr">
             <i data-lucide="scan-text"></i><span>OCR PDF</span>
-          </a>
-          <a href="#compare" class="nav-link" data-tool="compare">
-            <i data-lucide="columns"></i><span>Compare PDF</span>
           </a>
         </div>
 
@@ -126,16 +128,6 @@
           </a>
         </div>
 
-        <!-- AI Tools -->
-        <div class="nav-category">
-          <span class="category-title">Gemini</span>
-          <a href="#summarize" class="nav-link" data-tool="summarize">
-            <i data-lucide="sparkles"></i><span>AI Summarizer</span>
-          </a>
-          <a href="#chat" class="nav-link" data-tool="chat">
-            <i data-lucide="message-square"></i><span>Chat with PDF</span>
-          </a>
-        </div>
       </nav>
     </aside>
 
@@ -144,41 +136,301 @@
       
       <!-- Welcome Dashboard -->
       <section id="home-view" class="view-container active">
-        <div class="hero">
-          <h2>Simplify your PDF workflow</h2>
-          <p>A clean collection of orange-accented, open source tools to optimize, convert, protect, and edit your PDF files instantly in your browser.</p>
+        <div class="hero-premium">
+          <div class="hero-pill"><i data-lucide="zap"></i> No signups. No watermarks. 100% free.</div>
+          <h2>Every tool you need to work with PDFs.</h2>
+          <p>Merge, convert, compress, and edit your documents in seconds. Built for speed, privacy, and simplicity—without the annoying paywalls.</p>
+          
+          <div class="hero-search-bar">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="tool-search" placeholder="Search tools (e.g., merge, compress, protect)..." />
+          </div>
         </div>
 
         <div class="quick-tools-grid">
-          <a href="#merge" class="quick-card nav-link" data-tool="merge">
-            <div class="card-icon"><i data-lucide="git-merge"></i></div>
-            <h3>Merge PDF</h3>
-            <p>Combine multiple PDFs into a single file in the exact order you want.</p>
+          <a href="#merge" class="quick-card nav-link bento-normal" data-tool="merge" data-category="organize" data-search="merge combine join together pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="git-merge"></i></div>
+              <span class="tool-tag tag-organize">Organize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Merge PDF</h3>
+              <p>Combine multiple PDFs into a single document. Drag and drop to reorder pages easily.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
-          <a href="#split" class="quick-card nav-link" data-tool="split">
-            <div class="card-icon"><i data-lucide="scissors"></i></div>
-            <h3>Split PDF</h3>
-            <p>Separate pages or extract specific page ranges into new documents.</p>
+
+          <a href="#split" class="quick-card nav-link bento-normal" data-tool="split" data-category="organize" data-search="split separate divide extract pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="scissors"></i></div>
+              <span class="tool-tag tag-organize">Organize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Split PDF</h3>
+              <p>Extract specific page ranges or turn each page into a separate document.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
-          <a href="#compress" class="quick-card nav-link" data-tool="compress">
-            <div class="card-icon"><i data-lucide="minimize-2"></i></div>
-            <h3>Compress PDF</h3>
-            <p>Optimize and shrink your PDF files to reduce file size without losing quality.</p>
+
+          <a href="#compress" class="quick-card nav-link bento-normal" data-tool="compress" data-category="optimize" data-search="compress shrink reduce size optimize pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="minimize-2"></i></div>
+              <span class="tool-tag tag-optimize">Optimize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Compress PDF</h3>
+              <p>Reduce file size for easier emailing and sharing without losing visual clarity.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
-          <a href="#protect" class="quick-card nav-link" data-tool="protect">
-            <div class="card-icon"><i data-lucide="lock"></i></div>
-            <h3>Protect PDF</h3>
-            <p>Secure your sensitive data by encrypting your PDF with a strong password.</p>
+
+          <a href="#protect" class="quick-card nav-link bento-normal" data-tool="protect" data-category="security" data-search="protect lock encrypt password security pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="lock"></i></div>
+              <span class="tool-tag tag-security">Security</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Protect PDF</h3>
+              <p>Add a password to secure your PDF from unauthorized access and copying.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
-          <a href="#ocr" class="quick-card nav-link" data-tool="ocr">
-            <div class="card-icon"><i data-lucide="scan-text"></i></div>
-            <h3>OCR PDF</h3>
-            <p>Extract searchable, selectable text from scanned PDF pages or images.</p>
+
+          <a href="#ocr" class="quick-card nav-link bento-normal" data-tool="ocr" data-category="optimize" data-search="ocr scan text extract recognize image pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="scan-text"></i></div>
+              <span class="tool-tag tag-optimize">Optimize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>OCR PDF</h3>
+              <p>Make scanned documents and images fully searchable and selectable.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
-          <a href="#summarize" class="quick-card nav-link" data-tool="summarize">
-            <div class="card-icon"><i data-lucide="sparkles"></i></div>
-            <h3>AI Summarizer</h3>
-            <p>Generate precise, readable summary reports of long PDF documents instantly.</p>
+
+          <a href="#pdf-to-jpg" class="quick-card nav-link bento-normal" data-tool="pdf-to-jpg" data-category="convert" data-search="convert pdf to jpg image images pictures">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="images"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PDF to JPG</h3>
+              <p>Convert each page of your PDF into high-quality JPG images.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#pdf-to-word" class="quick-card nav-link bento-normal" data-tool="pdf-to-word" data-category="convert" data-search="convert pdf to word docx document text">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="file-text"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PDF to Word</h3>
+              <p>Turn your PDF into an editable Word document (.docx).</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#pdf-to-ppt" class="quick-card nav-link bento-normal" data-tool="pdf-to-ppt" data-category="convert" data-search="convert pdf to ppt pptx powerpoint presentation">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="presentation"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PDF to PPT</h3>
+              <p>Convert your PDF into a PowerPoint presentation (.pptx).</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#pdf-to-excel" class="quick-card nav-link bento-normal" data-tool="pdf-to-excel" data-category="convert" data-search="convert pdf to excel xlsx spreadsheet table">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="table"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PDF to Excel</h3>
+              <p>Extract tables and structured data into Excel spreadsheets (.xlsx).</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#jpg-to-pdf" class="quick-card nav-link bento-normal" data-tool="jpg-to-pdf" data-category="convert" data-search="convert jpg png image to pdf document">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="image"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>JPG to PDF</h3>
+              <p>Combine image files (JPG, PNG) into a single PDF document.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#word-to-pdf" class="quick-card nav-link bento-normal" data-tool="word-to-pdf" data-category="convert" data-search="convert word docx to pdf document">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="file-type-2"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Word to PDF</h3>
+              <p>Convert Word documents (.docx) into clean, standard PDFs.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#ppt-to-pdf" class="quick-card nav-link bento-normal" data-tool="ppt-to-pdf" data-category="convert" data-search="convert ppt pptx powerpoint to pdf presentation">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="presentation"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PowerPoint to PDF</h3>
+              <p>Turn your slides (.pptx) into easily shareable PDF files.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#excel-to-pdf" class="quick-card nav-link bento-normal" data-tool="excel-to-pdf" data-category="convert" data-search="convert excel xlsx spreadsheet to pdf table">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="table"></i></div>
+              <span class="tool-tag tag-convert">Convert</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Excel to PDF</h3>
+              <p>Save your spreadsheets (.xlsx) as easy-to-read PDF tables.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#watermark" class="quick-card nav-link bento-normal" data-tool="watermark" data-category="security" data-search="watermark stamp text brand pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="type"></i></div>
+              <span class="tool-tag tag-security">Security</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Watermark</h3>
+              <p>Add custom watermark text to your pages to protect your work.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#page-numbers" class="quick-card nav-link bento-normal" data-tool="page-numbers" data-category="security" data-search="page numbers insert pagination pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="hash"></i></div>
+              <span class="tool-tag tag-security">Security</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Page Numbers</h3>
+              <p>Insert clean page numbers in the header or footer of your document.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#forms" class="quick-card nav-link bento-normal" data-tool="forms" data-category="security" data-search="pdf forms fill extract json fields">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="edit-3"></i></div>
+              <span class="tool-tag tag-security">Security</span>
+            </div>
+            <div class="card-body-area">
+              <h3>PDF Forms</h3>
+              <p>View form fields or fill fillable PDF forms with structured data.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#unlock" class="quick-card nav-link bento-normal" data-tool="unlock" data-category="security" data-search="unlock remove password decrypt security pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="unlock"></i></div>
+              <span class="tool-tag tag-security">Security</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Unlock PDF</h3>
+              <p>Remove password security and permission locks from your file.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#remove-pages" class="quick-card nav-link bento-normal" data-tool="remove-pages" data-category="organize" data-search="remove delete pages strip pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="file-minus"></i></div>
+              <span class="tool-tag tag-organize">Organize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Remove Pages</h3>
+              <p>Delete unneeded pages from your PDF document.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
+          </a>
+
+          <a href="#extract" class="quick-card nav-link bento-normal" data-tool="extract" data-category="organize" data-search="extract save specific pages pdf">
+            <div class="card-top-row">
+              <div class="card-icon"><i data-lucide="file-output"></i></div>
+              <span class="tool-tag tag-organize">Organize</span>
+            </div>
+            <div class="card-body-area">
+              <h3>Extract Pages</h3>
+              <p>Select specific pages to save into a brand new document.</p>
+            </div>
+            <div class="card-bottom-row">
+              <span class="action-text">Launch Tool</span>
+              <i data-lucide="arrow-right" class="action-arrow"></i>
+            </div>
           </a>
         </div>
       </section>
@@ -187,104 +439,34 @@
       <section id="tool-view" class="view-container">
         <div class="workspace-header">
           <div class="workspace-title-area">
+            <div class="workspace-pill"><i data-lucide="check-circle-2"></i> Ready to process</div>
             <h2 id="tool-title">Merge PDF</h2>
             <p id="tool-desc">Combine PDFs in the order you want with the easiest PDF merger available.</p>
           </div>
-          <button class="back-home-btn" id="back-home"><i data-lucide="arrow-left"></i>Back to Home</button>
+          <button class="back-home-btn" id="back-home"><i data-lucide="arrow-left"></i> Back to Dashboard</button>
         </div>
 
         <div class="workspace-box">
           <div class="workspace-main">
             <div class="drop-zone" id="drop-zone">
-              <div class="drop-icon"><i data-lucide="upload-cloud" size="48"></i></div>
-              <p>Upload your files</p>
-              <span id="drop-zone-help">Drag & drop files here, or click to browse</span>
+              <div class="drop-icon"><i data-lucide="upload-cloud" size="54"></i></div>
+              <p>Upload your files here</p>
+              <span id="drop-zone-help">Drag & drop files here, or click to browse your computer</span>
               <input type="file" id="file-input" multiple style="display: none;" />
             </div>
 
             <div id="file-list" class="file-list"></div>
-
-             <!-- Gemini Analysis Options -->
-             <div id="gemini-options-container" class="gemini-options-box" style="display: none;">
-               <div class="options-group">
-                 <span class="options-group-title">Immediate</span>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-bullet-summary" checked />
-                   <span class="checkmark"></span>
-                   <span class="label-text">Bullet summary</span>
-                 </label>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-key-points" checked />
-                   <span class="checkmark"></span>
-                   <span class="label-text">Key points extraction</span>
-                 </label>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-title-gen" checked />
-                   <span class="checkmark"></span>
-                   <span class="label-text">Title generation</span>
-                 </label>
-               </div>
-               <div class="options-group">
-                 <span class="options-group-title">Then</span>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-chat-pdf" checked disabled />
-                   <span class="checkmark"></span>
-                   <span class="label-text">Chat with PDF</span>
-                 </label>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-semantic-search" />
-                   <span class="checkmark"></span>
-                   <span class="label-text">Semantic search</span>
-                 </label>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-flashcards" />
-                   <span class="checkmark"></span>
-                   <span class="label-text">AI flashcards</span>
-                 </label>
-                 <label class="checkbox-container">
-                   <input type="checkbox" id="opt-quiz" />
-                   <span class="checkmark"></span>
-                   <span class="label-text">AI quiz generation</span>
-                 </label>
-               </div>
-             </div>
 
             <div class="action-panel" id="action-panel">
               <div id="input-options" class="options-box">
                  <label id="input-label" for="custom-input">Input Options:</label>
                  <input type="text" id="custom-input" placeholder="" />
               </div>
-              <button id="action-btn" class="primary-btn">Execute</button>
+              <button id="action-btn" class="primary-btn"><i data-lucide="play" class="btn-play-icon"></i> Execute Processing</button>
               <div class="spinner" id="loading-spinner" style="display: none;"></div>
             </div>
             
             <div id="result-box" class="result-box" style="display: none;"></div>
-          </div>
-
-          <!-- Gemini Side Panel -->
-          <div class="workspace-side" id="gemini-side-panel" style="display: none;">
-            <div class="side-header">
-              <div class="side-title">
-                <i data-lucide="sparkles" style="color: var(--accent); width: 18px; height: 18px;"></i>
-                <span>Gemini Analysis</span>
-              </div>
-              <button id="copy-result-btn" class="btn-icon" title="Copy text">
-                <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
-              </button>
-            </div>
-            <div class="side-content" id="gemini-result-content">
-              <div class="empty-state" style="text-align: center; padding: 3rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
-                <i data-lucide="message-square" style="color: var(--text-muted); width: 32px; height: 32px;"></i>
-                <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">Waiting for document analysis...</p>
-              </div>
-            </div>
-             <!-- Side Chat Input Footer -->
-             <div class="side-chat-input-area" id="side-chat-input-area" style="display: none;">
-               <input type="text" id="side-chat-input" placeholder="Ask a follow-up question..." />
-               <button id="side-chat-send" class="btn-icon" title="Send question">
-                 <i data-lucide="send" style="width: 16px; height: 16px; color: var(--accent);"></i>
-               </button>
-             </div>
           </div>
         </div>
       </section>
@@ -298,5 +480,56 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
   <script type="module" src="/main.js"></script>
+  <script>
+    // Live Search & Category Filtering Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('tool-search');
+      const catPills = document.querySelectorAll('.nav-cat-btn');
+      const cards = document.querySelectorAll('.quick-tools-grid .quick-card');
+      const homeView = document.getElementById('home-view');
+      const toolView = document.getElementById('tool-view');
+
+      let currentCategory = 'all';
+      let currentSearch = '';
+
+      function filterCards() {
+        cards.forEach(card => {
+          const cardCat = card.getAttribute('data-category');
+          const cardSearch = card.getAttribute('data-search').toLowerCase();
+          
+          const matchesCat = (currentCategory === 'all' || cardCat === currentCategory);
+          const matchesSearch = cardSearch.includes(currentSearch.toLowerCase());
+
+          if (matchesCat && matchesSearch) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentSearch = e.target.value;
+          filterCards();
+        });
+      }
+
+      catPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          catPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentCategory = pill.getAttribute('data-cat');
+          filterCards();
+
+          if (toolView && toolView.classList.contains('active')) {
+            toolView.classList.remove('active');
+            homeView.classList.add('active');
+            window.location.hash = '#all-tools';
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

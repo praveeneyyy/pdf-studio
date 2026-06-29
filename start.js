@@ -7,7 +7,6 @@ const services = [
   { name: 'pdf-service', dir: 'pdf-service', cmd: 'node', args: ['index.js'], color: '\x1b[32m' }, // Green
   { name: 'conversion-service', dir: 'conversion-service', cmd: 'node', args: ['index.js'], color: '\x1b[33m' }, // Yellow
   { name: 'ocr-service', dir: 'ocr-service', cmd: 'node', args: ['index.js'], color: '\x1b[35m' }, // Magenta
-  { name: 'ai-service', dir: 'ai-service', cmd: 'node', args: ['index.js'], color: '\x1b[34m' }, // Blue
   { name: 'office-service', dir: 'office-service', cmd: 'node', args: ['index.js'], color: '\x1b[37m' }, // White
   { name: 'frontend', dir: 'frontend', cmd: 'npm', args: ['run', 'dev'], color: '\x1b[31m' } // Red
 ];
@@ -25,7 +24,7 @@ for (const svc of services) {
 
   const child = spawn(command, svc.args, {
     cwd: dirPath,
-    shell: true
+    shell: isWindows
   });
 
   const prefix = `${svc.color}[${svc.name}]\x1b[0m`;
