@@ -1,12 +1,12 @@
-# AllinPDF - Universal High-Fidelity Document Conversion Engine & PDF Tools Platform
+# uniPDF - Universal High-Fidelity Document Conversion Engine & PDF Tools Platform
 
-Welcome to **AllinPDF**, a professional, enterprise-grade PDF tools platform engineered to deliver **100% visual fidelity** for document conversion, OCR, and advanced PDF manipulations. 
+Welcome to **uniPDF**, a professional, enterprise-grade PDF tools platform engineered to deliver **100% visual fidelity** for document conversion, OCR, and advanced PDF manipulations. 
 
 ---
 
 ## 🌟 Architectural Philosophy: 100% Visual Fidelity
 
-AllinPDF strictly implements a **native rendering engine philosophy**. Rather than relying on inaccurate Javascript document rebuilders (such as Mammoth, SheetJS html export, or canvas re-draws), AllinPDF communicates directly with native rendering binaries (such as LibreOffice and Gotenberg). This guarantees that every exported file looks **identical** to the original—preserving exact layouts, fonts, margins, tables, merged cells, shapes, charts, watermarks, and pagination.
+uniPDF strictly implements a **native rendering engine philosophy**. Rather than relying on inaccurate Javascript document rebuilders (such as Mammoth, SheetJS html export, or canvas re-draws), uniPDF communicates directly with native rendering binaries (such as LibreOffice and Gotenberg). This guarantees that every exported file looks **identical** to the original—preserving exact layouts, fonts, margins, tables, merged cells, shapes, charts, watermarks, and pagination.
 
 ---
 
@@ -67,7 +67,7 @@ The server will run on `http://localhost:3000` (or your configured `PORT`).
 ## 🌍 Production Deployment Guide
 
 ### Backend: Deploying to Render
-AllinPDF comes fully configured for immediate deployment to **Render** as a single, production-ready Web Service.
+uniPDF comes fully configured for immediate deployment to **Render** as a single, production-ready Web Service.
 
 1. Connect your GitHub repository to Render.
 2. Render will automatically detect the `render.yaml` blueprint in the root directory.
