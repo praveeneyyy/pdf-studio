@@ -1,12 +1,12 @@
-# PDFly - Universal High-Fidelity Document Conversion Engine & PDF Tools Platform
+# AllinPDF - Universal High-Fidelity Document Conversion Engine & PDF Tools Platform
 
-Welcome to **PDFly**, a professional, enterprise-grade PDF tools platform engineered to deliver **100% visual fidelity** for document conversion, OCR, and advanced PDF manipulations. 
+Welcome to **AllinPDF**, a professional, enterprise-grade PDF tools platform engineered to deliver **100% visual fidelity** for document conversion, OCR, and advanced PDF manipulations. 
 
 ---
 
 ## 🌟 Architectural Philosophy: 100% Visual Fidelity
 
-PDFly strictly implements a **native rendering engine philosophy**. Rather than relying on inaccurate Javascript document rebuilders (such as Mammoth, SheetJS html export, or canvas re-draws), PDFly communicates directly with native rendering binaries (such as LibreOffice and Gotenberg). This guarantees that every exported file looks **identical** to the original—preserving exact layouts, fonts, margins, tables, merged cells, shapes, charts, watermarks, and pagination.
+AllinPDF strictly implements a **native rendering engine philosophy**. Rather than relying on inaccurate Javascript document rebuilders (such as Mammoth, SheetJS html export, or canvas re-draws), AllinPDF communicates directly with native rendering binaries (such as LibreOffice and Gotenberg). This guarantees that every exported file looks **identical** to the original—preserving exact layouts, fonts, margins, tables, merged cells, shapes, charts, watermarks, and pagination.
 
 ---
 
@@ -67,7 +67,7 @@ The server will run on `http://localhost:3000` (or your configured `PORT`).
 ## 🌍 Production Deployment Guide
 
 ### Backend: Deploying to Render
-PDFly comes fully configured for immediate deployment to **Render** as a single, production-ready Web Service.
+AllinPDF comes fully configured for immediate deployment to **Render** as a single, production-ready Web Service.
 
 1. Connect your GitHub repository to Render.
 2. Render will automatically detect the `render.yaml` blueprint in the root directory.
@@ -99,7 +99,7 @@ Create a `.env` file in the root directory (copy from `.env.example`):
 ```env
 PORT=3000
 NODE_ENV=production
-FRONTEND_URL=https://pdfly-tools.netlify.app
+FRONTEND_URL=https://allinpdf-tools.netlify.app
 API_URL=http://localhost:3000
 UPLOAD_DIR=uploads
 TEMP_DIR=temp
