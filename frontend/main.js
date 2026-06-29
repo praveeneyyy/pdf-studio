@@ -297,7 +297,7 @@ actionBtn.addEventListener('click', async () => {
   loadingSpinner.style.display = 'block';
   resultBox.style.display = 'none';
 
-  const clientSidePdfTools = ['merge', 'split', 'rotate', 'remove-pages', 'extract'];
+  const clientSidePdfTools = ['merge', 'split', 'rotate', 'remove-pages', 'extract', 'jpg-to-pdf', 'watermark', 'page-numbers', 'forms'];
   if (clientSidePdfTools.includes(currentTool)) {
       try {
           const PDFDocument = window.PDFLib.PDFDocument;
@@ -372,6 +372,96 @@ actionBtn.addEventListener('click', async () => {
               }
               finalBytes = await newPdf.save();
               downloadName = 'extracted_pages.pdf';
+          } else if (currentTool === 'jpg-to-pdf') {
+              const newPdf = await PDFDocument.create();
+              for (const file of uploadedFiles) {
+                  const bytes = await file.arrayBuffer();
+                  let image;
+                  if (file.type === 'image/jpeg' || file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg')) {
+                      image = await newPdf.embedJpg(bytes);
+                  } else if (file.type === 'image/png' || file.name.toLowerCase().endsWith('.png')) {
+                      image = await newPdf.embedPng(bytes);
+                  }
+                  if (image) {
+                      const page = newPdf.addPage([image.width, image.height]);
+                      page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+                  }
+              }
+              finalBytes = await newPdf.save();
+              downloadName = 'converted_images.pdf';
+          } else if (currentTool === 'watermark') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const text = customInput.value || 'CONFIDENTIAL';
+              const pages = pdf.getPages();
+              const { rgb, degrees } = window.PDFLib;
+              pages.forEach(page => {
+                  const { width, height } = page.getSize();
+                  page.drawText(text, {
+                      x: width / 2 - (text.length * 12),
+                      y: height / 2,
+                      size: 40,
+                      color: rgb(0.6, 0.6, 0.6),
+                      opacity: 0.5,
+                      rotate: degrees(45)
+                  });
+              });
+              finalBytes = await pdf.save();
+              downloadName = 'watermarked.pdf';
+          } else if (currentTool === 'page-numbers') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const pages = pdf.getPages();
+              const { rgb } = window.PDFLib;
+              pages.forEach((page, idx) => {
+                  const { width } = page.getSize();
+                  page.drawText(String(idx + 1), {
+                      x: width / 2 - 5,
+                      y: 30,
+                      size: 12,
+                      color: rgb(0.2, 0.2, 0.2)
+                  });
+              });
+              finalBytes = await pdf.save();
+              downloadName = 'page_numbered.pdf';
+          } else if (currentTool === 'forms') {
+              const file = uploadedFiles[0];
+              const bytes = await file.arrayBuffer();
+              const pdf = await PDFDocument.load(bytes);
+              const form = pdf.getForm();
+              
+              if (customInput.value.trim() && customInput.value.trim() !== '{"field_name": "value"}') {
+                  try {
+                      const dataToFill = JSON.parse(customInput.value);
+                      for (const [key, val] of Object.entries(dataToFill)) {
+                          const field = form.getField(key);
+                          if (field) {
+                              if (field.constructor.name === 'PDFTextField') field.setText(val);
+                              else if (field.constructor.name === 'PDFCheckBox') { if (val) field.check(); else field.uncheck(); }
+                          }
+                      }
+                  } catch(e) {
+                      throw new Error("Invalid JSON data for filling form");
+                  }
+                  finalBytes = await pdf.save();
+                  downloadName = 'filled_form.pdf';
+              } else {
+                  const fields = form.getFields();
+                  const data = {};
+                  fields.forEach(f => {
+                      try { data[f.getName()] = f.getText ? f.getText() : null; } catch(e){}
+                  });
+                  
+                  actionPanel.style.display = 'none';
+                  resultBox.style.display = 'block';
+                  resultBox.textContent = "Extracted Form Fields:\n" + JSON.stringify(data, null, 2);
+                  if (progressContainer) progressContainer.style.display = 'none';
+                  loadingSpinner.style.display = 'none';
+                  actionBtn.style.display = 'block';
+                  return; 
+              }
           }
           
           const blob = new Blob([finalBytes], { type: downloadName.endsWith('.zip') ? 'application/zip' : 'application/pdf' });
