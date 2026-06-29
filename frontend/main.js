@@ -1,6 +1,7 @@
 let currentTool = null;
 let uploadedFiles = [];
-const API_BASE = import.meta.env.VITE_API_BASE || ((import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api'); // Pointing to unified Express API
+const defaultUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://pdf-tools-backend.onrender.com';
+const API_BASE = (import.meta.env && import.meta.env.VITE_API_BASE) ? import.meta.env.VITE_API_BASE : (((import.meta.env && import.meta.env.VITE_API_URL) ? import.meta.env.VITE_API_URL : defaultUrl) + '/api');
 
 // Markdown Rendering Helper with offline fallback
 const renderMarkdown = (text) => {
